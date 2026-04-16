@@ -5,7 +5,7 @@ Hey team! This repository holds our Group REST API Enhancement project. I have i
 ## Table of Contents
 1. [System Overview & Plan](#system-overview-plan)
 2. [Current Backend Files](#current-backend-files)
-3. [Client Screenshots](tba)
+3. [Client Screenshots]()
 
 ### System Overview & Plan
 
