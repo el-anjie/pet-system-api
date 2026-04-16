@@ -19,8 +19,14 @@ I have set up the initial backend files to get us started:
 - **`db.php` (Database Integration):**
   - Connects to the local MySQL database named `user_system`.
   - Includes built-in error handling. If the database connection drops, it will output a clean JSON error (HTTP 500) instead of crashing the PHP script.
+  - **Refer to the schema below:**
+
+![Database Schema; user(id, username, password) 1 <---> 0...* pet(id, user_id, pet_name, pet_type)](database-schema.png)
 
 - **`api.php` (REST API Logic):**
   - This is our main controller. It forces all responses into strict JSON format with proper HTTP headers.
   - Includes a custom `respond()` function to easily send back standard HTTP status codes (200, 201, 400, 409, 500).
-  - **Currently Implemented:** The `register` endpoint. It accepts a username and password, checks if the user already exists, hashes the password for security, and saves it to the database.
+  - **Currently Implemented:** 
+      - The `register` endpoint. It accepts a username and password, checks if the user already exists, hashes the password for security, and saves it to the database.
+      - The `login` endpoint. It accepts a username and password, checks if both fields match its corresponding record in the database, and responds accordingly: (1) for **empty field/s**, returns an error; (2) if **user does not exist**, it returns an error; (3) if the **password is incorrect**, it blocks login and returns an error; (4) if **username and password match** the ones in the database, it returns a success response.
+  
