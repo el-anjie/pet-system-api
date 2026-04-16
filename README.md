@@ -19,6 +19,9 @@ I have set up the initial backend files to get us started:
 - **`db.php` (Database Integration):**
   - Connects to the local MySQL database named `user_system`.
   - Includes built-in error handling. If the database connection drops, it will output a clean JSON error (HTTP 500) instead of crashing the PHP script.
+  - **Refer to the schema below:**
+
+![Database Schema; user(id, username, password) 1 <---> 0...* pet(id, user_id, pet_name, pet_type)](database-schema.png)
 
 - **`api.php` (REST API Logic):**
   - This is our main controller. It forces all responses into strict JSON format with proper HTTP headers.
