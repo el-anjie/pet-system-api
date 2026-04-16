@@ -42,6 +42,7 @@ I have set up the initial backend files to get us started:
       - The `get_pets` endpoint. It optionally accepts a user ID. If left null (empty), it will return all pets in the database. If a user ID is specified, it responds with all the pets for that user.
       - The `get_users` endpoint. It returns all users with compatibility fields for `display_name` and `created_at`.
       - The `update_pet` endpoint. It accepts a pet ID and at least one field (`pet_name` or `pet_type`) to update an existing pet record.
+      - The `update_user` endpoint. It accepts a valid existing user ID and updates `username` and/or `password` for that same user only.
 
 ### Run with Docker
 
@@ -85,6 +86,7 @@ Send requests to `src/api.php` with `action=<action_name>`.
 - `get_pets` (GET/POST)
 - `get_users` (GET/POST)
 - `update_pet` (POST/PUT/PATCH)
+- `update_user` (POST/PUT/PATCH)
 
 Standalone health endpoint:
 - `healthcheck.php` (GET)

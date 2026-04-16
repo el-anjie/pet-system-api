@@ -317,6 +317,95 @@ elseif ($action === "update_pet") {
     }
 }
 
+// UPDATE USER
+// updates username and/or password for a valid existing user_id
+elseif ($action === "update_user") {
+    require_method(["POST", "PUT", "PATCH"], "Only POST, PUT, or PATCH is allowed");
+
+    $user_id = (int) read_input($payload, "user_id", 0);
+    $username_update = trim((string) read_input($payload, "username", ""));
+    $password_update = (string) read_input($payload, "password", "");
+
+    if ($user_id <= 0) {
+        respond_compat(400, [
+            "status" => "error",
+            "message" => "user_id is required"
+        ], "error", "user_id is required");
+    }
+
+    $check_user = $conn->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
+    $check_user->bind_param("i", $user_id);
+    $check_user->execute();
+    $check_user->store_result();
+
+    if ($check_user->num_rows === 0) {
+        respond_compat(404, [
+            "status" => "error",
+            "message" => "User not found"
+        ], "error", "User not found");
+    }
+
+    if ($username_update === "" && $password_update === "") {
+        respond_compat(400, [
+            "status" => "error",
+            "message" => "At least one field is required: username or password"
+        ], "error", "At least one field is required: username or password");
+    }
+
+    if ($username_update !== "") {
+        $check_username = $conn->prepare("SELECT id FROM users WHERE username = ? AND id <> ? LIMIT 1");
+        $check_username->bind_param("si", $username_update, $user_id);
+        $check_username->execute();
+        $check_username->store_result();
+
+        if ($check_username->num_rows > 0) {
+            respond_compat(409, [
+                "status" => "error",
+                "message" => "Username already exists"
+            ], "error", "Username already exists");
+        }
+    }
+
+    try {
+        if ($username_update !== "" && $password_update !== "") {
+            $password_hash = password_hash($password_update, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
+            $stmt->bind_param("ssi", $username_update, $password_hash, $user_id);
+        } elseif ($username_update !== "") {
+            $stmt = $conn->prepare("UPDATE users SET username = ? WHERE id = ?");
+            $stmt->bind_param("si", $username_update, $user_id);
+        } else {
+            $password_hash = password_hash($password_update, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $stmt->bind_param("si", $password_hash, $user_id);
+        }
+
+        if (!$stmt->execute()) {
+            respond_compat(500, [
+                "status" => "error",
+                "message" => "Update failed"
+            ], "error", "Update failed");
+        }
+
+        if ($stmt->affected_rows > 0) {
+            respond_compat(200, [
+                "status" => "success",
+                "message" => "User updated successfully"
+            ], "success", "User updated successfully");
+        }
+
+        respond_compat(200, [
+            "status" => "warning",
+            "message" => "No user found or no changes made"
+        ], "warning", "No user found or no changes made");
+    } catch (Throwable $e) {
+        respond_compat(500, [
+            "status" => "error",
+            "message" => "Update failed"
+        ], "error", "Update failed");
+    }
+}
+
 
 // INVALID
 // if action is not valid i.e. does not exist, respond with error
